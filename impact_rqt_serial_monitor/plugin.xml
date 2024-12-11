@@ -1,0 +1,17 @@
+<library path="src">
+  <class name="impact_rqt_serial_monitor" type="impact_rqt_serial_monitor.serial_monitor.ImpactRqtSerialMonitor" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A RQT GUI plugin to monitor serial communcation
+    </description>
+    
+    <qtgui>
+      <group>
+        <label>Impact Tools</label>
+      </group>
+      <label>Serial Monitor</label>
+      <!--<icon type="file">resource/icons/impact_rqt_serial_monitor.png</icon> -->
+      <icon type="theme">system-help</icon> 
+      <statustip>Great user interface to show serial communication.</statustip>
+    </qtgui>
+  </class>
+</library>

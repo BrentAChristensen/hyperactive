@@ -1,0 +1,17 @@
+<library path="src">
+  <class name="impact_rqt_limit_switches" type="impact_rqt_limit_switches.Limit_switches.ImpactRqtLimitSwitches" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A RQT GUI plugin to monitor serial communcation
+    </description>
+    
+    <qtgui>
+      <group>
+        <label>Impact Tools</label>
+      </group>
+      <label>Test Limit Switches</label>
+      <!--<icon type="file">resource/icons/impact_rqt_limit_switches.png</icon> -->
+      <icon type="theme">system-help</icon> 
+      <statustip>Great user interface to show limit switches.</statustip>
+    </qtgui>
+  </class>
+</library>

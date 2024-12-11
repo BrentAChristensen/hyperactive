@@ -1,0 +1,15 @@
+<library path="src">
+  <class name="impact_rqt_joint_states" type="impact_rqt_joint_states.impact_rqt_joint_states.ImpactRqtJointStates" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>Impact Tools</label>
+      </group>
+      <label>Joint States Monitor</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Great user interface to show published joint states.</statustip>
+    </qtgui>
+  </class>
+</library>
