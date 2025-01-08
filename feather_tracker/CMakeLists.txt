@@ -3,14 +3,17 @@ project(feather_tracker)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclpy REQUIRED)
-find_package(ros2_aruco_interfaces REQUIRED)
 
-install(DIRECTORY launch scripts
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+
+install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
 install (PROGRAMS 
-  scripts/follow_feather.py
+  feather_tracker/detection_to_pose_node.py
+  feather_tracker/follow_feather.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
