@@ -76,7 +76,7 @@ def generate_launch_description():
         PathJoinSubstitution([FindExecutable(name="xacro")]),
         " ",
         PathJoinSubstitution(
-            [FindPackageShare("ar_description"), "urdf", "ar.urdf.xacro"]),
+            [FindPackageShare("annin_ar4_description"), "urdf", "ar.urdf.xacro"]),
         " ",
         "ar_model:=",
         ar_model_config,
@@ -91,7 +91,7 @@ def generate_launch_description():
         PathJoinSubstitution([FindExecutable(name="xacro")]),
         " ",
         PathJoinSubstitution(
-            [FindPackageShare("ar_moveit_config"), "srdf", "ar.srdf.xacro"]),
+            [FindPackageShare("annin_ar4_moveit_config"), "srdf", "ar.srdf.xacro"]),
         " ",
         "name:=",
         ar_model_config,
@@ -106,7 +106,7 @@ def generate_launch_description():
     robot_description_kinematics = {
         "robot_description_kinematics":
         load_yaml(
-            "ar_moveit_config",
+            "annin_ar4_moveit_config",
             os.path.join("config", "kinematics.yaml"),
         )
     }
@@ -114,15 +114,15 @@ def generate_launch_description():
     robot_description_planning = {
         "robot_description_planning":
         load_yaml(
-            "ar_moveit_config",
+            "annin_ar4_moveit_config",
             os.path.join("config", "joint_limits.yaml"),
         )
     }
 
     # Planning Configuration
-    ompl_planning_yaml = load_yaml("ar_moveit_config",
+    ompl_planning_yaml = load_yaml("annin_ar4_moveit_config",
                                    "config/ompl_planning.yaml")
-    pilz_planning_yaml = load_yaml("ar_moveit_config",
+    pilz_planning_yaml = load_yaml("annin_ar4_moveit_config",
                                    "config/pilz_planning.yaml")
     planning_pipeline_config = {
         "default_planning_pipeline": "ompl",
@@ -132,7 +132,7 @@ def generate_launch_description():
     }
 
     # Trajectory Execution Configuration
-    controllers_yaml = load_yaml("ar_moveit_config", "config/controllers.yaml")
+    controllers_yaml = load_yaml("annin_ar4_moveit_config", "config/controllers.yaml")
 
     moveit_controllers = {
         "moveit_simple_controller_manager":
@@ -185,7 +185,7 @@ def generate_launch_description():
 
     # rviz with moveit configuration
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("ar_moveit_config"), "rviz", rviz_config_file])
+        [FindPackageShare("annin_ar4_moveit_config"), "rviz", rviz_config_file])
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -229,38 +229,6 @@ def generate_launch_description():
         ])
     )
 
-    yolo_node = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(
-                        get_package_share_directory("yolo_bringup"),
-                        "launch",
-                        "yolo.launch.py",
-                    )
-                ),
-                launch_arguments={
-                    "model": LaunchConfiguration("model", default="/workspaces/ar4_ws/data/peacockv2/peacock/runs/detect/train6/weights/best.pt"),
-                    "tracker": LaunchConfiguration("tracker", default="bytetrack.yaml"),
-                    "target_frame": LaunchConfiguration("target_frame", default="base_link"),
-                    "device": LaunchConfiguration("device", default="cpu"),
-                    "enable": LaunchConfiguration("enable", default="True"),
-                    "use_3d" : LaunchConfiguration("use_3d", default="True"),
-                    "use_debug" : LaunchConfiguration("use_debug", default="True"),
-                    "threshold": LaunchConfiguration("threshold", default="0.5"),
-                    "input_image_topic": LaunchConfiguration(
-                        "input_image_topic", default="/camera/camera/color/image_raw"
-                    ),
-                    "input_depth_topic": LaunchConfiguration(
-                        "input_depth_topic", default="/camera/camera/depth/image_rect_raw"
-                    ),
-                    "input_depth_info_topic":  LaunchConfiguration(
-                        "input_depth_info_topic", default="/camera/camera/depth/camera_info"
-                    ),
-                    "image_reliability": LaunchConfiguration(
-                        "image_reliability", default="2"
-                    ),
-                    "namespace": LaunchConfiguration("namespace", default="yolo"),
-                }.items(),
-    )
     
     # Add DetectionToPoseMapper Node
     detection_to_pose_mapper_node = Node(
@@ -276,7 +244,7 @@ def generate_launch_description():
 
     nodes_to_start = [
         move_group_node, joint_state_publisher_node, rviz_node, detection_to_pose_mapper_node,
-        realsense, yolo_node, camera_tf_publisher 
+        realsense, camera_tf_publisher 
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)

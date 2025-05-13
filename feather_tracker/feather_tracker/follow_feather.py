@@ -1,105 +1,50 @@
 #!/usr/bin/env python3
-"""Example that uses MoveIt 2 to follow a target inside Ignition Gazebo"""
 
 import rclpy
-from geometry_msgs.msg import Pose, PoseStamped,TransformStamped
-from pymoveit2 import MoveIt2
-from pymoveit2.robots import ar4
-from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
-from rclpy.qos import QoSProfile
-from tf2_ros import StaticTransformBroadcaster
 
+# moveit_py modules (namespaces may differ depending on the version).
+from moveit_py.core import RobotInterface
+from moveit_py.planning import PlanParameters, MoveItPy
+from moveit_py.robot import PlanningComponent
 
-class MoveItFollowTarget(Node):
+class MoveRobot(Node):
     def __init__(self):
-        super().__init__("ex_follow_target_py")
+        super().__init__('move_robot_node')
 
-        # Create callback group that allows execution of callbacks in parallel without restrictions
-        self._callback_group = ReentrantCallbackGroup()
-
-        # Create MoveIt 2 interface
-        self._moveit2 = MoveIt2(
-            node=self,
-            joint_names=ar4.joint_names(),
-            base_link_name=ar4.base_link_name(),
-            end_effector_name=ar4.end_effector_name(),
-            group_name=ar4.MOVE_GROUP_ARM,
-            use_move_group_action=True,
-            callback_group=self._callback_group,
-        )
-        # Use upper joint velocity and acceleration limits
-        self._moveit2.max_velocity = 1.0
-        self._moveit2.max_acceleration = 1.0
-
-        # Create a subscriber for target pose
-        self.__previous_target_pose = Pose()
-        self.create_subscription(
-            msg_type=PoseStamped,
-            topic="/mapped_pose",
-            callback=self.target_pose_callback,
-            qos_profile=QoSProfile(depth=1),
-            callback_group=self._callback_group,
-        )
-
-      # Create a static transform broadcaster
-        self.static_broadcaster = StaticTransformBroadcaster(self)
-
-        self.get_logger().info("Initialization successful.")
-
-    def target_pose_callback(self, msg: PoseStamped):
-        """
-        Plan and execute trajectory each time the target pose is changed
-        """
-
-        # Return if target pose is unchanged
-        if msg.pose == self.__previous_target_pose:
-            return
+        # Initialize MoveItPy main interface
+        self.moveit_py = MoveItPy(node_name=self.get_name())
         
-        self.get_logger().info("Target pose has changed. Planning and executing...")
+        # Get a RobotInterface (abstract interface to the entire robot)
+        self.robot_interface = self.moveit_py.get_robot_interface()
+        
+        # Create a PlanningComponent for the robot arm
+        self.arm = self.moveit_py.get_planning_component("ar_manipulator")
+        
+    def plan_and_move(self):
+        # Example: Plan to a predefined joint configuration or pose
+        # (In a real scenario, you'd set your target angles or pose below)
+        
+        # 1) Define Joint Goal (replace with actual values for your robot)
+        joint_goal = [0.0, -1.57, 1.57, 0.0, 0.0, 0.0]
+        self.arm.set_joint_goal(joint_goal)
 
-        msg.pose.orientation.w = 1.0
-        print(msg) 
-        # Plan and execute motion
-        self._moveit2.move_to_pose(
-            position=msg.pose.position,
-            quat_xyzw=msg.pose.orientation,
-        )
-
-        # Update for next callback
-        self.__previous_target_pose = msg.pose
-        # Publish the static transform
-        self.publish_static_transform(msg)
-
-    def publish_static_transform(self, pose_stamped: PoseStamped):
-        """Publish a static transform based on the given PoseStamped."""
-
-        transform_stamped = TransformStamped()
-
-        transform_stamped.header.stamp = self.get_clock().now().to_msg()
-        transform_stamped.header.frame_id = 'base_link'  # Replace with appropriate frame
-        transform_stamped.child_frame_id = 'ee_link'  # Replace with desired child frame ID
-
-        transform_stamped.transform.translation.x = pose_stamped.pose.position.x
-        transform_stamped.transform.translation.y = pose_stamped.pose.position.y
-        transform_stamped.transform.translation.z = pose_stamped.pose.position.z
-
-        transform_stamped.transform.rotation = pose_stamped.pose.orientation
-
-        self.static_broadcaster.sendTransform(transform_stamped)
+        # 2) Plan
+        plan_result = self.arm.plan()
+        if plan_result:
+            self.get_logger().info("Plan succeeded, executing...")
+            # 3) Execute
+            self.arm.execute(plan_result.trajectory)
+        else:
+            self.get_logger().error("Plan failed!")
 
 def main(args=None):
     rclpy.init(args=args)
-
-    target_follower = MoveItFollowTarget()
-
-    executor = rclpy.executors.MultiThreadedExecutor(2)
-    executor.add_node(target_follower)
-    executor.spin()
-
+    node = MoveRobot()
+    node.plan_and_move()
+    
     rclpy.shutdown()
-    exit(0)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+#
