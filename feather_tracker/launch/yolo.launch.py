@@ -63,7 +63,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "rviz_config_file",
-            default_value="moveit_with_yolo_ros.rviz",
+            default_value="moveit_with_yolo.rviz",
             description="Full path to the RViz configuration file to use",
         ))
     declared_arguments.append(

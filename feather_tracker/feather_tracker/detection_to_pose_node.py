@@ -8,7 +8,7 @@ import math
 class DetectionToPoseNode(Node):
     def __init__(self, target_class_name, detection_topic):
         super().__init__('detection_to_pose_node')
-
+        self.get_logger().info("detection_to_pose_node initiated")
         # Store the target class name
         self.target_class_name = target_class_name
         
@@ -32,6 +32,7 @@ class DetectionToPoseNode(Node):
     def detection_callback(self, detection_array_msg):
         for detection in detection_array_msg.detections:
             if detection.class_name == self.target_class_name:  # Use the class name argument
+                self.get_logger().info("detection_callback called")
                 pose_msg = PoseStamped()
                 
                 # Extracting position from bbox3d center
