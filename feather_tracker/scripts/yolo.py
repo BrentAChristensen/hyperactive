@@ -23,7 +23,7 @@ class RealSenseListener(Node):
         self.bridge = CvBridge()
 
         # Initialize YOLO model
-        self.model = YOLO("/home/brent/ar4_ws/data/peacockv2/peacock/runs/detect/train6/weights/best.pt")
+        self.model = YOLO("/peacockv2/peacock/runs/detect/train6/weights/best.pt")
         self.names = self.model.model.names
 
         # Track history for each ID
