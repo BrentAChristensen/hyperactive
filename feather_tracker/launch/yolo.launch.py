@@ -111,12 +111,16 @@ def generate_launch_description():
         )
     }
 
+  # MoveIt Configuration (Adding cartesian_limits here)
     robot_description_planning = {
-        "robot_description_planning":
-        load_yaml(
+        "robot_description_planning": load_yaml(
             "annin_ar4_moveit_config",
             os.path.join("config", "joint_limits.yaml"),
-        )
+        ),
+        "robot_description_planning.cartesian_limits.max_trans_vel": 1.0,  # Example value
+        "robot_description_planning.cartesian_limits.max_trans_acc": 0.5,   # Example value
+        "robot_description_planning.cartesian_limits.max_trans_dec": 0.01,
+        "robot_description_planning.cartesian_limits.max_rot_vel": 0.08727   
     }
 
     # Planning Configuration
